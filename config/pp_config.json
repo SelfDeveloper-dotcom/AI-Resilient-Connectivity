@@ -1,0 +1,20 @@
+{
+  "operator": "Operator A",
+  "technology": "2G",
+  "minimum_kpi_completeness_for_model": 0.95,
+  "columns": {
+    "date": "DATE_SUBMITTED",
+    "cell": "CELL",
+    "technology": "Technology (2G/3G/4G)",
+    "state": "STATE",
+    "lga": "LGA",
+    "traffic": "2G Erlang ",
+    "availability": "Availability",
+    "cssr": "CSSR",
+    "sd_congestion": "SDCCH Congestion Rate",
+    "tch_congestion": "TCH Congestion Rate",
+    "dcr": "Drop Call Rate ",
+    "hosr": "Handover Success Rate"
+  },
+  "geography_master_csv": "reference/state_lga_master.csv"
+}

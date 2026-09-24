@@ -1,0 +1,22 @@
+{
+  "target_column": "qos_degradation_next_day",
+  "target_available_column": "target_available",
+  "date_column": "date",
+  "operator_column": "operator",
+  "technology_column": "technology",
+  "model_eligible_column": "model_eligible",
+  "feature_ready_column": "feature_ready_7d",
+  "minimum_training_rows": 100,
+  "minimum_positive_rows": 10,
+  "test_fraction": 0.25,
+  "primary_metric": "f1",
+  "prediction_threshold": 0.50,
+  "random_state": 42,
+  "models": ["logistic_regression", "random_forest"],
+  "exclude_prefixes": ["target_"],
+  "exclude_columns": [
+    "sheet", "date", "operator", "technology", "quality_status", "model_eligible",
+    "submission_id", "source_filename", "sha256", "feature_engineering_status",
+    "target_available", "target_definition", "target_reason", "qos_degradation_next_day"
+  ]
+}

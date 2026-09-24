@@ -1,0 +1,9 @@
+{
+  "host": "127.0.0.1",
+  "port": 8000,
+  "predictions_csv": "data/master/predictions.csv",
+  "policy_csv": "data/master/policy_decisions.csv",
+  "alerts_csv": "data/master/alerts.csv",
+  "validation_csv": "data/master/validation_report.csv",
+  "features_csv": "data/master/model_features.csv"
+}

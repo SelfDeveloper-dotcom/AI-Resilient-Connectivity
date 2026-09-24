@@ -1,0 +1,7 @@
+{
+  "source_dir": "knowledge_base/source",
+  "chunk_words": 180,
+  "overlap_words": 30,
+  "top_k": 5,
+  "supported_extensions": [".md", ".txt", ".docx", ".pdf"]
+}

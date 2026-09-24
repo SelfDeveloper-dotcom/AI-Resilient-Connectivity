@@ -1,0 +1,12 @@
+{
+  "date_column": "date",
+  "operator_column": "operator",
+  "technology_column": "technology",
+  "model_eligible_column": "model_eligible",
+  "source_target_column": "multi_kpi_stress_flag",
+  "source_stress_count_column": "concurrent_deterioration_count",
+  "output_target_column": "qos_degradation_next_day",
+  "require_consecutive_next_day": true,
+  "require_next_day_model_eligible": true,
+  "note": "Sandbox proxy only: day t target=1 when next consecutive model-eligible day has multi_kpi_stress_flag=1. Replace/refine after historical data review and formal degradation definition."
+}

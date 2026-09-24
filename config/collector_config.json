@@ -1,0 +1,21 @@
+{
+  "project_root": "..",
+  "source_root": "data/inbox",
+  "raw_root": "data/raw",
+  "processed_root": "data/processed",
+  "master_root": "data/master",
+  "registry_file": "data/master/submission_registry.csv",
+  "pp_config": "config/pp_config.json",
+  "allowed_extensions": [".xlsx"],
+  "technology": "2G",
+  "operators": {
+    "Operator_A": "Operator A",
+    "Operator_B": "Operator B",
+    "Operator_C": "Operator C",
+    "Operator_D": "Operator D"
+  },
+  "feature_config": "config/feature_config.json",
+  "feature_output": "data/master/model_features.csv",
+  "target_config": "config/target_config.json",
+  "target_output": "data/master/training_dataset.csv"
+}

@@ -1,0 +1,41 @@
+# Python
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# Secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# IDE
+.vscode/
+.idea/
+
+# Real operator/source data
+data/inbox/*/*.xlsx
+data/inbox/*/*.xls
+data/raw/**
+!data/raw/.gitkeep
+data/processed/**
+!data/processed/.gitkeep
+data/master/*.csv
+data/master/*.json
+
+# Generated sandbox outputs
+data/sandbox/*.csv
+data/sandbox/*.json
+
+# Trained models / registry state
+models/registry/model_*/
+models/registry/active.json
+models/sandbox_registry/
+
+# Runtime
+logs/*.log
+*.tmp
+~$*

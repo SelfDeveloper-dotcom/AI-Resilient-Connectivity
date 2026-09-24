@@ -1,0 +1,2 @@
+-r requirements.txt
+boxsdk[jwt]>=3.14,<4

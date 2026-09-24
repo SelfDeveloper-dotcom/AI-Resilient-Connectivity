@@ -1,0 +1,36 @@
+{
+  "date_column": "date",
+  "operator_column": "operator",
+  "technology_column": "technology",
+  "model_eligible_column": "model_eligible",
+  "quality_status_column": "quality_status",
+  "traffic_column": "total_traffic_erlang",
+  "good_high_kpis": [
+    "availability_mean",
+    "availability_p10",
+    "cssr_mean",
+    "cssr_p10",
+    "hosr_mean",
+    "hosr_p10"
+  ],
+  "bad_high_kpis": [
+    "sd_congestion_mean",
+    "sd_congestion_p95",
+    "tch_congestion_mean",
+    "tch_congestion_p95",
+    "dcr_mean",
+    "dcr_p90"
+  ],
+  "primary_stress_kpis": {
+    "availability_mean": {"direction": "good_high", "epsilon": 0.05},
+    "cssr_mean": {"direction": "good_high", "epsilon": 0.05},
+    "hosr_mean": {"direction": "good_high", "epsilon": 0.05},
+    "dcr_mean": {"direction": "bad_high", "epsilon": 0.02},
+    "sd_congestion_mean": {"direction": "bad_high", "epsilon": 0.01},
+    "tch_congestion_mean": {"direction": "bad_high", "epsilon": 0.01}
+  },
+  "rolling_windows": [3, 7],
+  "change_lags": [1, 3],
+  "multi_kpi_stress_min_count": 3,
+  "require_consecutive_dates_for_lag_features": true
+}

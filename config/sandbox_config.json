@@ -1,0 +1,9 @@
+{
+  "days": 240,
+  "operators": ["Operator A", "Operator B", "Operator C", "Operator D"],
+  "start_date": "2026-01-01",
+  "seed": 42,
+  "stress_event_probability": 0.08,
+  "stress_duration_min": 2,
+  "stress_duration_max": 5
+}

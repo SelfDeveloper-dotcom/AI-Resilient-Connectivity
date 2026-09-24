@@ -1,0 +1,19 @@
+{
+  "probability_column": "degradation_probability",
+  "prediction_column": "predicted_degradation",
+  "quality_column": "quality_status",
+  "eligible_column": "model_eligible",
+  "stress_count_column": "concurrent_deterioration_count",
+  "low_threshold": 0.35,
+  "review_threshold": 0.55,
+  "high_threshold": 0.75,
+  "minimum_stress_count_for_high": 2,
+  "human_review_required": true,
+  "actions": {
+    "NO_DECISION": "Do not issue a model-based decision; inspect data quality or feature readiness.",
+    "MONITOR": "Continue routine monitoring; no automated regulatory action.",
+    "WATCH": "Place on analyst watchlist and review recent KPI trends.",
+    "REVIEW": "Analyst review recommended; inspect affected KPIs, geography and supporting evidence.",
+    "HIGH_REVIEW": "Priority analyst review recommended; validate against source data before any regulatory or operational action."
+  }
+}
