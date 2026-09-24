@@ -1,0 +1,4 @@
+category,title,authority_or_owner,version_or_date,local_filename,approved_for_local_use,approved_for_git,notes
+01_STANDARDS,Example standard,ITU-T,YYYY-MM,example.pdf,yes,no,Replace with authorised local reference
+02_NCC_QOS,Example QoS reference,NCC,YYYY-MM,example.docx,yes,no,Replace with approved reference
+03_AI_GOVERNANCE,Example AI governance reference,Relevant authority,YYYY-MM,example.pdf,yes,no,Replace with approved reference

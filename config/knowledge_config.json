@@ -1,7 +1,20 @@
 {
-  "source_dir": "knowledge_base/source",
+  "source_dirs": [
+    "knowledge_base/source",
+    "docs"
+  ],
   "chunk_words": 180,
   "overlap_words": 30,
   "top_k": 5,
-  "supported_extensions": [".md", ".txt", ".docx", ".pdf"]
+  "min_score": 0.0,
+  "max_features": 30000,
+  "supported_extensions": [
+    ".md",
+    ".txt",
+    ".docx",
+    ".pdf"
+  ],
+  "excluded_files": [
+    "docs/KNOWLEDGE_BASE.md"
+  ]
 }

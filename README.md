@@ -110,13 +110,16 @@ python mlfo.py activate model_YYYYMMDDTHHMMSSZ
 
 ## 6. Knowledge base
 
-Copy authoritative source documents into `knowledge_base/source/`, then query locally:
+The Knowledge Base automatically indexes the project `docs/` directory plus authorised local documents placed under `knowledge_base/source/`. Recommended local collections are `01_STANDARDS`, `02_NCC_QOS`, `03_AI_GOVERNANCE`, and `04_PROJECT_LOCAL`.
+
+Query locally:
 
 ```powershell
+python knowledge_base.py --stats
 python knowledge_base.py "What does the project require for human review?"
 ```
 
-The API also exposes `/knowledge?q=...`.
+The API exposes `/knowledge?q=...` and `/knowledge/stats`. The browser dashboard now includes a **Knowledge Base Search** panel showing retrieved evidence, source, category and relevance score. See `docs/KNOWLEDGE_BASE.md`.
 
 ## 7. Automated tests
 
