@@ -34,12 +34,9 @@ For a fast understanding of the use case before reviewing the code, start with t
 
 ### Submission
 
-- **Repository** — `<add GitHub repository URL>`
 - **Knowledge base** — `knowledge_base/source/` plus project `docs/`
-- **Live system** — local prototype: `http://127.0.0.1:8000/dashboard?mode=sandbox` (`<add deployed URL if available>`)
-- **Demo video** — `<add link>`
+- **Live system** — local prototype: `http://127.0.0.1:8000/dashboard?mode=sandbox`
 - **Technical report** — [`docs/AI_for_Resilient_Connectivity_Technical_Report.pdf`](docs/AI_for_Resilient_Connectivity_Technical_Report.pdf)
-- **One-page evaluation scenario** — [`docs/AI_for_Resilient_Connectivity_Evaluation_One_Page.docx`](docs/AI_for_Resilient_Connectivity_Evaluation_One_Page.docx)
 
 ---
 
