@@ -4,7 +4,7 @@
 
 The Knowledge Base provides source-grounded evidence to analysts using the AI Resilient Connectivity prototype. It is deliberately separated from the ML prediction model and the policy engine.
 
-The service **retrieves evidence**; it does not change a prediction, infer a regulatory breach by itself, or automatically trigger enforcement.
+The service **answers questions from retrieved evidence**; it does not change a prediction, infer a regulatory breach by itself, or automatically trigger enforcement. Answers are controlled/extractive and remain traceable to source evidence.
 
 ## Indexed corpus
 
@@ -29,18 +29,19 @@ Recommended local folders:
 
 Scanned/image-only PDFs should be converted to searchable text before ingestion.
 
-## Retrieval method
+## Retrieval and answering method
 
-The v1.1 knowledge service uses TF-IDF with unigram/bigram features and cosine similarity. Results contain:
+The v1.2 knowledge service uses a transparent hybrid ranker: TF-IDF/cosine similarity plus lexical overlap, exact acronym/entity matching, query expansion and source-category boosts. Common project acronyms such as NAIS, MLFO, QoS, CSSR, DCR, HOSR, SDCCH and TCH can be expanded before retrieval.
 
-- document title
-- source path
-- category
-- chunk number
-- relevance score
-- retrieved evidence text
+The user-facing flow is:
 
-This is intentionally transparent and deterministic for the Sandbox baseline.
+1. interpret/expand the question;
+2. retrieve and re-rank relevant evidence;
+3. produce a concise controlled/extractive answer;
+4. show grounding confidence;
+5. show supporting evidence with title, source, category, chunk and score.
+
+The raw `/knowledge` retrieval endpoint remains available for debugging/audit. The answer layer does not use unrestricted generative text and abstains when the indexed evidence is insufficient.
 
 ## User interfaces
 
@@ -48,12 +49,14 @@ Command line:
 
 ```powershell
 python knowledge_base.py --stats
-python knowledge_base.py "Why is human review required?"
+python knowledge_base.py --answer "What is the full meaning of NAIS?"
+python knowledge_base.py --answer "Why is human review required?"
 ```
 
 API:
 
 ```text
+GET /knowledge/answer?q=Why%20is%20human%20review%20required?
 GET /knowledge?q=Why%20is%20human%20review%20required?
 GET /knowledge/stats
 GET /knowledge/sources
@@ -77,9 +80,9 @@ Use at least these questions during the Sandbox demonstration:
 
 For external standards/regulatory questions, the corresponding authorised source document must first be placed in the relevant local corpus folder.
 
-## Future RAG layer
+## Optional future LLM RAG layer
 
-A later version may add an LLM to synthesize a natural-language answer from retrieved evidence. Any such layer should:
+v1.2 already provides deterministic grounded answer synthesis. A later version may optionally add an LLM for more fluent multi-document synthesis. Any LLM layer should:
 
 - cite/identify the retrieved source documents;
 - abstain when evidence is insufficient;

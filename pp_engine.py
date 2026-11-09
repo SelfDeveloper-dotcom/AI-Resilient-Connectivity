@@ -120,18 +120,24 @@ class PPProcessor:
 
     def process_workbook(self, workbook_path: str | Path, sheet_name: str | None = None):
         wb = load_workbook(workbook_path, read_only=True, data_only=True)
-        summaries: list[DailySummary] = []
-        validation_rows: list[dict[str, Any]] = []
+        try:
+            summaries: list[DailySummary] = []
+            validation_rows: list[dict[str, Any]] = []
 
-        sheet_names = [sheet_name] if sheet_name else wb.sheetnames
-        for current_sheet in sheet_names:
-            if current_sheet not in wb.sheetnames:
-                raise ValueError(f"Worksheet not found: {current_sheet}. Available: {wb.sheetnames}")
-            summary, validations = self._process_sheet(wb[current_sheet])
-            summaries.append(summary)
-            validation_rows.extend(validations)
+            sheet_names = [sheet_name] if sheet_name else list(wb.sheetnames)
+            for current_sheet in sheet_names:
+                if current_sheet not in wb.sheetnames:
+                    raise ValueError(f"Worksheet not found: {current_sheet}. Available: {wb.sheetnames}")
+                summary, validations = self._process_sheet(wb[current_sheet])
+                summaries.append(summary)
+                validation_rows.extend(validations)
 
-        return summaries, validation_rows
+            return summaries, validation_rows
+        finally:
+            # Explicitly release the underlying Excel file handle. This is
+            # essential on Windows, where an open read-only workbook prevents
+            # temporary/submitted .xlsx files from being moved or deleted.
+            wb.close()
 
     def _process_sheet(self, ws):
         rows = ws.iter_rows(values_only=True)

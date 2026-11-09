@@ -3,11 +3,15 @@
     "knowledge_base/source",
     "docs"
   ],
-  "chunk_words": 180,
-  "overlap_words": 30,
-  "top_k": 5,
-  "min_score": 0.0,
-  "max_features": 30000,
+  "chunk_words": 130,
+  "overlap_words": 25,
+  "top_k": 6,
+  "answer_top_k": 5,
+  "answer_evidence": 4,
+  "answer_sentences": 2,
+  "medium_confidence_score": 0.18,
+  "min_score": 0.02,
+  "max_features": 40000,
   "supported_extensions": [
     ".md",
     ".txt",
@@ -16,5 +20,38 @@
   ],
   "excluded_files": [
     "docs/KNOWLEDGE_BASE.md"
-  ]
+  ],
+  "category_boosts": {
+    "01_STANDARDS": 0.10,
+    "02_NCC_QOS": 0.10,
+    "03_AI_GOVERNANCE": 0.10,
+    "04_PROJECT_LOCAL": 0.05,
+    "PROJECT_DOCS": 0.00,
+    "LOCAL_REFERENCE": 0.02
+  },
+  "query_aliases": {
+    "NAIS": "National Artificial Intelligence Strategy",
+    "MLFO": "Machine Learning Function Orchestrator",
+    "SRC": "Source",
+    "PP": "Preprocessor",
+    "CSSR": "Call Setup Success Rate",
+    "DCR": "Drop Call Rate",
+    "HOSR": "Handover Success Rate",
+    "SDCCH": "Standalone Dedicated Control Channel",
+    "TCH": "Traffic Channel",
+    "QOS": "Quality of Service"
+  },
+  "rag": {
+    "enabled": true,
+    "ollama_url": "http://127.0.0.1:11434",
+    "embedding_model": "embeddinggemma",
+    "generation_model": "qwen3:4b",
+    "embedding_batch_size": 24,
+    "semantic_weight": 0.58,
+    "lexical_weight": 0.32,
+    "boost_weight": 0.10,
+    "request_timeout_seconds": 120,
+    "max_context_chars": 12000,
+    "temperature": 0.1
+  }
 }

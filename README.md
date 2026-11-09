@@ -1,5 +1,7 @@
 # AI Resilient Connectivity
 
+**Release: v1.2.0**
+
 End-to-end prototype for **next-period mobile-network QoS degradation early warning**, aligned conceptually with ITU-T Y.3172 pipeline roles.
 
 ## What is implemented
@@ -16,7 +18,7 @@ End-to-end prototype for **next-period mobile-network QoS degradation early warn
 - **SINK** — FastAPI service and browser dashboard
 - **MLFO** — versioned model registry and active-model switching
 - **ML Sandbox** — synthetic historical Operator × Day data for safe end-to-end demonstration
-- **Knowledge service** — local TF-IDF retrieval over Markdown, TXT, DOCX and PDF documents
+- **Knowledge service** — grounded question answering with hybrid retrieval over Markdown, TXT, DOCX and PDF documents
 
 ## Important governance boundary
 
@@ -116,10 +118,10 @@ Query locally:
 
 ```powershell
 python knowledge_base.py --stats
-python knowledge_base.py "What does the project require for human review?"
+python knowledge_base.py --answer "What does NAIS stand for?"
 ```
 
-The API exposes `/knowledge?q=...` and `/knowledge/stats`. The browser dashboard now includes a **Knowledge Base Search** panel showing retrieved evidence, source, category and relevance score. See `docs/KNOWLEDGE_BASE.md`.
+The API exposes `/knowledge/answer?q=...` for answer-first grounded responses, `/knowledge?q=...` for raw retrieval, plus `/knowledge/stats` and `/knowledge/sources`. The browser dashboard presents only the concise grounded answer for readability; raw retrieval evidence remains available through the API for audit/debugging. See `docs/KNOWLEDGE_BASE.md`.
 
 ## 7. Automated tests
 

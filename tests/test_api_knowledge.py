@@ -7,7 +7,7 @@ class APIKnowledgeTests(unittest.TestCase):
     def test_dashboard_contains_knowledge_search(self):
         page = api.dashboard("sandbox")
         self.assertIn("Knowledge Base Search", page)
-        self.assertIn("/knowledge?q=", page)
+        self.assertIn("/knowledge/answer?q=", page)
 
     def test_knowledge_stats_available(self):
         stats = api.knowledge_stats()
@@ -25,6 +25,13 @@ class APIKnowledgeTests(unittest.TestCase):
         self.assertTrue(results)
         self.assertIn("source", results[0])
         self.assertIn("text", results[0])
+
+    def test_knowledge_answer_endpoint_returns_grounded_structure(self):
+        result = api.knowledge_answer("What KPIs are used in the current 2G scope?", 5)
+        self.assertIn("answer", result)
+        self.assertIn("evidence", result)
+        self.assertTrue(result["evidence"])
+
 
 
 if __name__ == "__main__":

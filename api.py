@@ -11,7 +11,7 @@ from fastapi.responses import HTMLResponse, RedirectResponse
 from knowledge_base import KnowledgeBase
 
 ROOT = Path(__file__).resolve().parent
-app = FastAPI(title="AI Resilient Connectivity", version="1.1.0")
+app = FastAPI(title="AI Resilient Connectivity", version="1.3.1")
 kb = KnowledgeBase()
 
 
@@ -80,6 +80,11 @@ def knowledge(q: str, top_k: int = Query(5, ge=1, le=20)):
     return kb.query(q, top_k)
 
 
+@app.get("/knowledge/answer")
+def knowledge_answer(q: str, top_k: int = Query(5, ge=1, le=20)):
+    return kb.answer(q, top_k)
+
+
 @app.get("/knowledge/stats")
 def knowledge_stats():
     return kb.stats()
@@ -94,101 +99,53 @@ def knowledge_sources():
 def dashboard(mode: str = Query("real", pattern="^(real|sandbox)$")):
     latest_df = load_csv(mode, "latest_status.csv")
     alerts_df = load_csv(mode, "alerts.csv")
+    policy_df = load_csv(mode, "policy_decisions.csv")
     model = active_model(mode) or "No active model"
     kb_stats = kb.stats()
 
-    def table(df: pd.DataFrame, cols: list[str]) -> str:
-        if df.empty:
-            return "<p>No data yet.</p>"
-        cols = [c for c in cols if c in df.columns]
-        d = df[cols].tail(20)
-        th = "".join(f"<th>{html.escape(c)}</th>" for c in cols)
-        body = "".join(
-            "<tr>"
-            + "".join(f"<td>{html.escape(str(v))}</td>" for v in row)
-            + "</tr>"
-            for row in d.astype(str).itertuples(index=False, name=None)
-        )
-        return f"<table><thead><tr>{th}</tr></thead><tbody>{body}</tbody></table>"
+    def safe_num(v, default=None):
+        try:
+            if pd.isna(v):
+                return default
+            return float(v)
+        except Exception:
+            return default
 
-    cards = ""
-    if not latest_df.empty:
-        for _, r in latest_df.iterrows():
-            op = html.escape(str(r.get("operator", "Operator")))
-            prob = r.get("degradation_probability", "")
-            dec = html.escape(str(r.get("policy_decision", "")))
-            date = html.escape(str(r.get("date", "")))
-            cards += (
-                f"<div class='card'><h3>{op}</h3><p>{date}</p>"
-                f"<b>Risk: {prob}</b><p>{dec}</p></div>"
-            )
+    def decision_class(level: str) -> str:
+        return {"HIGH_REVIEW":"danger","REVIEW":"review","WATCH":"watch","MONITOR":"good","NO_DECISION":"muted"}.get(str(level or "").upper(),"muted")
 
-    categories = ", ".join(
-        f"{html.escape(str(k))}: {v}" for k, v in kb_stats.get("categories", {}).items()
-    ) or "No documents indexed"
+    def operator_cards() -> str:
+        if latest_df.empty:
+            return "<div class='empty-state'><div class='empty-icon'>◌</div><b>No operator predictions yet</b><span>Run the pipeline to populate the latest status.</span></div>"
+        cards=[]
+        sort_col="operator" if "operator" in latest_df.columns else latest_df.columns[0]
+        for _,r in latest_df.sort_values(sort_col).iterrows():
+            op=html.escape(str(r.get("operator","Operator"))); raw=safe_num(r.get("degradation_probability"))
+            risk=(raw*100 if raw is not None and raw<=1 else raw) if raw is not None else None
+            risk_txt="—" if risk is None else f"{risk:.0f}%"; risk_deg=0 if risk is None else max(0,min(100,risk))*3.6
+            dec=html.escape(str(r.get("policy_decision","NO_DECISION"))); cls=decision_class(dec)
+            date=html.escape(str(r.get("date",""))); quality=html.escape(str(r.get("quality_status","—"))); stress=html.escape(str(r.get("concurrent_deterioration_count","—")))
+            cards.append(f"<button class='operator-card' data-operator='{op}' onclick='selectOperator(this.dataset.operator)'><div class='operator-card-top'><div><div class='operator-name'>{op}</div><div class='operator-date'>{date}</div></div><span class='badge {cls}'>{dec.replace('_',' ')}</span></div><div class='risk-row'><div class='risk-ring' style='--risk:{risk_deg}deg'><div><strong>{risk_txt}</strong><span>risk</span></div></div><div class='mini-metrics'><div><span>Quality</span><b>{quality}</b></div><div><span>Stress KPIs</span><b>{stress}</b></div></div></div></button>")
+        return "".join(cards)
 
-    return f"""<!doctype html>
-<html>
-<head>
-<meta charset='utf-8'>
-<meta name='viewport' content='width=device-width, initial-scale=1'>
-<title>AI Resilient Connectivity</title>
-<style>
-body{{font-family:Segoe UI,Arial,sans-serif;margin:28px;background:#f6f7f9;color:#17202a;max-width:1400px}}
-h1{{margin-bottom:4px}} .sub{{color:#5d6d7e}} .cards{{display:flex;gap:14px;flex-wrap:wrap;margin:20px 0}}
-.card{{background:white;border:1px solid #ddd;border-radius:10px;padding:16px;min-width:210px;box-shadow:0 1px 3px #ddd}}
-table{{border-collapse:collapse;width:100%;background:white}} th,td{{border:1px solid #ddd;padding:7px;font-size:13px;vertical-align:top}} th{{background:#eef2f6;text-align:left}}
-.note{{background:#fff6df;border-left:4px solid #d6a100;padding:12px;margin:15px 0}}
-.kb{{background:white;border:1px solid #ddd;border-radius:10px;padding:18px;margin:22px 0;box-shadow:0 1px 3px #ddd}}
-.searchrow{{display:flex;gap:8px;flex-wrap:wrap}} input[type=text]{{flex:1;min-width:280px;padding:10px;border:1px solid #bbb;border-radius:6px;font-size:14px}}
-button{{padding:10px 16px;border:0;border-radius:6px;background:#1f5f99;color:white;cursor:pointer}} button:hover{{background:#174b79}}
-.result{{border-top:1px solid #e2e2e2;padding:12px 0}} .meta{{font-size:12px;color:#667788}} .score{{font-weight:600}}
-.small{{font-size:12px;color:#667788}} code{{background:#f1f3f5;padding:2px 4px;border-radius:3px}}
-</style>
-</head>
-<body>
-<h1>AI Resilient Connectivity</h1>
-<div class='sub'>Mode: {html.escape(mode.upper())} · Y.3172-aligned QoS early-warning prototype · Active model: {html.escape(model)}</div>
-<div class='note'>Model outputs are decision-support signals. Human validation is required before operational or regulatory action. Sandbox and real-data registries are strictly separate.</div>
-<div class='cards'>{cards or '<div class="card">No latest predictions yet.</div>'}</div>
+    def alert_rows() -> str:
+        if alerts_df.empty:
+            return "<tr><td colspan='5'><div class='empty-inline'>No WATCH / REVIEW alerts in this mode.</div></td></tr>"
+        rows=[]
+        for _,r in alerts_df.tail(12).iloc[::-1].iterrows():
+            level=str(r.get("policy_decision","")); cls=decision_class(level); raw=safe_num(r.get("degradation_probability")); risk=(raw*100 if raw is not None and raw<=1 else raw) if raw is not None else None; risk_txt="—" if risk is None else f"{risk:.1f}%"
+            rows.append("<tr>"+f"<td>{html.escape(str(r.get('date','')))}</td>"+f"<td><b>{html.escape(str(r.get('operator','')))}</b></td>"+f"<td><span class='badge {cls}'>{html.escape(level.replace('_',' '))}</span></td>"+f"<td>{risk_txt}</td>"+f"<td>{html.escape(str(r.get('recommended_action','')))}</td></tr>")
+        return "".join(rows)
 
-<h2>Recent alerts</h2>
-{table(alerts_df,['date','operator','degradation_probability','policy_decision','recommended_action','explanation'])}
-<h2>Latest operator status</h2>
-{table(latest_df,['date','operator','quality_status','concurrent_deterioration_count','degradation_probability','policy_decision'])}
-
-<section class='kb'>
-<h2>Knowledge Base Search</h2>
-<p>Search the project requirements, architecture and authorised local standards/regulatory references. Results are retrieved evidence, not model predictions or autonomous regulatory decisions.</p>
-<div class='searchrow'>
-<input id='kbq' type='text' placeholder='e.g. Why is human review required before regulatory action?'>
-<button onclick='searchKB()'>Search</button>
-</div>
-<p class='small'>Indexed: {kb_stats.get('documents',0)} documents · {kb_stats.get('chunks',0)} chunks · {categories}</p>
-<div id='kbstatus' class='small'></div>
-<div id='kbresults'></div>
-</section>
-
-<script>
-function esc(s){{
-  return String(s ?? '').replace(/[&<>"']/g, c => ({{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}})[c]);
-}}
-async function searchKB(){{
-  const q=document.getElementById('kbq').value.trim();
-  const status=document.getElementById('kbstatus');
-  const out=document.getElementById('kbresults');
-  if(!q){{status.textContent='Enter a question first.'; out.innerHTML=''; return;}}
-  status.textContent='Searching local knowledge sources...'; out.innerHTML='';
-  try{{
-    const r=await fetch('/knowledge?q='+encodeURIComponent(q)+'&top_k=5');
-    if(!r.ok) throw new Error('HTTP '+r.status);
-    const data=await r.json();
-    if(!data.length){{status.textContent='No relevant evidence found.'; return;}}
-    status.textContent='Retrieved '+data.length+' evidence chunk(s).';
-    out.innerHTML=data.map((x,i)=>`<div class="result"><div class="meta">${{i+1}}. <b>${{esc(x.title)}}</b> · ${{esc(x.category)}} · <code>${{esc(x.source)}}</code> · chunk ${{esc(x.chunk)}} · <span class="score">score ${{esc(x.score)}}</span></div><p>${{esc(x.text)}}</p></div>`).join('');
-  }}catch(e){{status.textContent='Knowledge search failed: '+e.message;}}
-}}
-document.getElementById('kbq').addEventListener('keydown',e=>{{if(e.key==='Enter') searchKB();}});
-</script>
-</body>
-</html>"""
+    latest_records=[] if latest_df.empty else latest_df.where(pd.notna(latest_df),None).to_dict(orient="records")
+    history_records=[]
+    if not policy_df.empty and "date" in policy_df.columns:
+        cols=[c for c in ["date","operator","degradation_probability","policy_decision","availability_mean","cssr_mean","dcr_mean","hosr_mean","sd_congestion_mean","tch_congestion_mean","total_traffic_erlang","concurrent_deterioration_count"] if c in policy_df.columns]
+        hist=policy_df[cols].copy(); hist["__date"]=pd.to_datetime(hist["date"],errors="coerce"); hist=hist.sort_values([c for c in ["operator","__date"] if c in hist.columns]).drop(columns="__date",errors="ignore"); history_records=hist.tail(1000).where(pd.notna(hist),None).to_dict(orient="records")
+    operators=int(latest_df["operator"].nunique()) if not latest_df.empty and "operator" in latest_df.columns else 0
+    alerts_count=int(len(alerts_df)); high_count=int((alerts_df.get("policy_decision",pd.Series(dtype=str)).astype(str)=="HIGH_REVIEW").sum()) if not alerts_df.empty else 0
+    docs=int(kb_stats.get("documents",0)); chunks=int(kb_stats.get("chunks",0)); categories=", ".join(f"{k}: {v}" for k,v in kb_stats.get("categories",{}).items()) or "No documents indexed"
+    page=(ROOT/"templates/dashboard.html").read_text(encoding="utf-8")
+    replacements={"__MODE__":html.escape(mode.upper()),"__MODEL__":html.escape(model),"__REAL_ACTIVE__":"active" if mode=="real" else "","__SANDBOX_ACTIVE__":"active" if mode=="sandbox" else "","__OPERATORS__":str(operators),"__ALERTS__":str(alerts_count),"__HIGH__":str(high_count),"__DOCS__":str(docs),"__CHUNKS__":str(chunks),"__OPERATOR_CARDS__":operator_cards(),"__ALERT_ROWS__":alert_rows(),"__CATEGORIES__":html.escape(categories),"__LATEST_JSON__":json.dumps(latest_records,default=str),"__HISTORY_JSON__":json.dumps(history_records,default=str)}
+    for key,val in replacements.items(): page=page.replace(key,val)
+    return page

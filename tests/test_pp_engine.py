@@ -18,7 +18,7 @@ class PPTests(unittest.TestCase):
             cell="CELL_0" if duplicate and i==1 else f"CELL_{i}"
             cssr=104.0 if i==9 else 99.5
             ws.append(["2026-08-03",cell,"2G","FCT","AMAC",100+i,99.2,cssr,0.1,0.05,0.2,99.0])
-        x=root/"sample.xlsx"; wb.save(x)
+        x=root/"sample.xlsx"; wb.save(x); wb.close()
         return td,cfg,x
 
     def test_invalid_field_is_warning_not_whole_day_failure(self):

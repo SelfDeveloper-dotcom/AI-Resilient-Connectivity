@@ -47,3 +47,6 @@ knowledge_base/source/02_NCC_QOS/*
 !knowledge_base/source/02_NCC_QOS/.gitkeep
 knowledge_base/source/03_AI_GOVERNANCE/*
 !knowledge_base/source/03_AI_GOVERNANCE/.gitkeep
+
+# Local knowledge embedding cache
+knowledge_base/cache/
